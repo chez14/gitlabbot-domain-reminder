@@ -1,0 +1,20 @@
+{
+  "name": "domain-reminder",
+  "version": "1.0.0",
+  "description": "Domain Renewal Remind",
+  "main": "src/app.tx",
+  "author": "Chris Qiang <chris@christianto.net>",
+  "license": "MIT",
+  "dependencies": {
+    "@gitbeaker/node": "^23.5.0",
+    "dotenv": "^8.2.0",
+    "whois": "^2.12.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "start": "ts-node -r dotenv/config src/app.ts"
+  }
+}
