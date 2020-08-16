@@ -1,4 +1,5 @@
 import { logger } from "./get-winston-instance";
+import { DomainInfo } from "../model/DomainInfo";
 
 const whoiser = require('whoiser');
 
@@ -6,7 +7,7 @@ const expiryDate = /expir(y|ation)/i
 
 let domainLogger = logger.child({ defaultMeta: { service: 'whois-exporter' } });
 // get domains
-export let DomainExpirationExporter = async (domains: string[]) => {
+export let DomainExpirationExporter = async (domains: string[]): Promise<DomainInfo[]> => {
     let domainExpiration = Promise.all(domains.map(async (domain) => {
         domainLogger.info("Starting WHOIS resolver for " + domain);
         let mismatch: string[] = [];
@@ -39,12 +40,15 @@ export let DomainExpirationExporter = async (domains: string[]) => {
         })
         domainLogger.info("Resolve ok for " + domain);
 
-        return {
+        let result: DomainInfo = {
             domain: domain,
             servers: Object.keys(domainInfo),
-            mismatch: mismatch,
-            expiration: expiration
+            mismatch: mismatch
         };
+        if (expiration) {
+            result['expiration'] = expiration;
+        }
+        return result;
     }))
     domainLogger.info("WHOIS exporter done.");
 

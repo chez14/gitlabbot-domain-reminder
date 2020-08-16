@@ -1,20 +1,6 @@
-// import { Gitlab } from "@gitbeaker/node";
 import { readFileSync } from "fs";
 import path from "path"
 var DateDiff = require('date-diff');
-
-// let client = new Gitlab({
-//     token: process.env.GITLAB_PERSONAL_TOKEN,
-//     host: process.env.GITLAB_HOST
-// });
-
-
-// client.Issues.create((process.env.GITLAB_PROJECT || ""), {
-//     title: "Domain Renewal Notification for ${domainname}",
-//     description: "Hi,\n\nThis domain is going to be expired in 30 days. Please renew.",
-//     assignee_ids: [process.env.ISSUE_AUTOASSIGN],
-//     labels: process.env.ISSUE_AUTOLABEL
-// });
 
 /**
  * Flow:
@@ -35,21 +21,25 @@ var DateDiff = require('date-diff');
 
 import { DomainExpirationExporter } from "./utils/domain-expiration-exporter";
 import { logger } from "./utils/get-winston-instance";
+import { CreateGitLabReminderIssue } from "./utils/gitlab-create-issue";
 (async function () {
     let runtimeLogger = logger.child({ defaultMeta: { service: 'runtime' } });
     runtimeLogger.info("Reading configuration files...")
-    let domains: string[] = JSON.parse(await readFileSync(path.join(__dirname, "../configuration/domainlist.json"), { encoding: "utf-8" }));
+    let domains: string[] = JSON.parse(readFileSync(path.join(__dirname, "../configuration/domainlist.json"), { encoding: "utf-8" }));
     runtimeLogger.info(`>> ${domains.length} domains loaded.`);
     runtimeLogger.info("Fetching WHOIS info... please wait.");
     let domainExp = await DomainExpirationExporter(domains);
     runtimeLogger.info(`There's ${domainExp.length} domains scanned.`);
 
-    let expirationDateLimits = process.env.DAYS_BEFORE_REMINDER || 40;
+    let expirationDateLimits = process.env.DAYS_BEFORE_REMINDER || 4000;
     let expiringDomain = (domainExp).filter((domain) => (new DateDiff(domain.expiration, new Date())).days() <= expirationDateLimits);
     runtimeLogger.info(`There's ${expiringDomain.length} domains that need to be renewed.`);
     if (expiringDomain.length == 0) {
         runtimeLogger.info("Nothings to report. All domains are okay.")
         return process.exit(0);
     }
-    // create gitlab issue.
+    runtimeLogger.info(`Creating reminder for the domains... please wait.`);
+    await CreateGitLabReminderIssue(expiringDomain)
+    runtimeLogger.info(`Reminder created. Exiting...`);
+    return process.exit(0);
 })();
