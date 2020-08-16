@@ -26,11 +26,11 @@ export let DomainExpirationExporter = async (domains: string[]) => {
                             domainLogger.warn(">>>> WARN! Expiration date unmatch on server " + whoisServer)
                             // not a match!
                             mismatch.push(whoisServer)
-                            domainLogger.warn("Expiration date mismatched: ", expiration, newExpiration);
+                            domainLogger.warn(`Expiration date mismatched: ${expiration.toISOString()} <=> ${newExpiration.toISOString()}`);
                             if (newExpiration.valueOf() < expiration.valueOf()) {
                                 newExpiration = expiration;
-                                domainLogger.warn(">>>> WARN! Will assume expiration date as " + expiration)
                             }
+                            domainLogger.warn(">>>> WARN! Will assume expiration date as " + newExpiration)
                         }
                     }
                     expiration = newExpiration;
