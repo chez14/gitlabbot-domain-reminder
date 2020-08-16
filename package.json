@@ -7,8 +7,11 @@
   "license": "MIT",
   "dependencies": {
     "@gitbeaker/node": "^23.5.0",
+    "date-diff": "^0.2.2",
     "dotenv": "^8.2.0",
-    "whois": "^2.12.1"
+    "ts-node": "^8.10.2",
+    "whoiser": "^1.8.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "nodemon": "^2.0.4",

@@ -1,3 +1,5 @@
 node_modules
 .env
 configuration/domainlist.json
+
+**.log
